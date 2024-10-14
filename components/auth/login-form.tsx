@@ -16,8 +16,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import FormError from "@/components/auth/form-error";
 import FormSuccess from "@/components/auth/form-success";
+import { login } from "@/actions/login";
+import { useState, useTransition } from "react";
 
 const LoginForm = () => {
+  const [error, setError] = useState<string | undefined>("");
+  const [success, setSuccess] = useState<string | undefined>("");
+  const [isPending, startTransition] = useTransition();
+
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
@@ -27,8 +33,18 @@ const LoginForm = () => {
   });
 
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
-    console.log(values);
+    setError("");
+    setSuccess("");
+
+    startTransition(() => {
+      login(values).then((values) => {
+        setError(values.error);
+        setSuccess(values.success);
+      });
+    });
   };
+
+  console.log(isPending);
 
   return (
     <CardWrapper
@@ -47,7 +63,12 @@ const LoginForm = () => {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder={"Email"} type={"email"} />
+                    <Input
+                      {...field}
+                      placeholder={"Email"}
+                      type={"email"}
+                      disabled={isPending}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -64,6 +85,7 @@ const LoginForm = () => {
                       {...field}
                       placeholder={"******"}
                       type={"password"}
+                      disabled={isPending}
                     />
                   </FormControl>
                   <FormMessage />
@@ -71,9 +93,9 @@ const LoginForm = () => {
               )}
             />
           </div>
-          <FormError message={"로그인에 실패했습니다."} />
-          <FormSuccess message={"로그인에 성공했습니다."} />
-          <Button type="submit" className={"w-full"}>
+          <FormError message={error} />
+          <FormSuccess message={success} />
+          <Button type="submit" className={"w-full"} disabled={isPending}>
             Login
           </Button>
         </form>
