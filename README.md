@@ -7,3 +7,8 @@
 - Zod - ^3.23.8
 - React Hook Form - ^7.53.0
 - Auth.js - v5
+
+## Style
+
+- Tailwind CSS
+- Shadcn UI

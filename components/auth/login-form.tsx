@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import FormError from "@/components/auth/form-error";
+import FormSuccess from "@/components/auth/form-success";
 
 const LoginForm = () => {
   const form = useForm<z.infer<typeof LoginSchema>>({
@@ -24,6 +26,10 @@ const LoginForm = () => {
     },
   });
 
+  const onSubmit = (values: z.infer<typeof LoginSchema>) => {
+    console.log(values);
+  };
+
   return (
     <CardWrapper
       headerLabel="Welcome Back!"
@@ -32,12 +38,7 @@ const LoginForm = () => {
       showSocial={true}
     >
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit((data) => {
-            console.log(data);
-          })}
-          className={"space-y-6"}
-        >
+        <form onSubmit={form.handleSubmit(onSubmit)} className={"space-y-6"}>
           <div className={"space-y-4"}>
             <FormField
               control={form.control}
@@ -70,6 +71,8 @@ const LoginForm = () => {
               )}
             />
           </div>
+          <FormError message={"로그인에 실패했습니다."} />
+          <FormSuccess message={"로그인에 성공했습니다."} />
           <Button type="submit" className={"w-full"}>
             Login
           </Button>
