@@ -1,9 +1,22 @@
-import { auth } from "@/auth";
+import { auth, signOut } from "@/auth";
 
 const Page = async () => {
   const session = await auth();
 
-  return <div>{JSON.stringify(session, null, 2)}</div>;
+  return (
+    <div>
+      {JSON.stringify(session, null, 2)}
+
+      <form
+        action={async () => {
+          "use server";
+          await signOut({ redirectTo: "/" });
+        }}
+      >
+        <button type="submit">Sign Out</button>
+      </form>
+    </div>
+  );
 };
 
 export default Page;
