@@ -3,6 +3,8 @@ import { auth, signOut } from "@/auth";
 const Page = async () => {
   const session = await auth();
 
+  console.log(session);
+
   return (
     <div>
       {JSON.stringify(session, null, 2)}
