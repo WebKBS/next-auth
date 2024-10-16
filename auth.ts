@@ -2,19 +2,45 @@ import NextAuth from "next-auth";
 import authConfig from "@/auth.config";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import db from "@/lib/db";
+import { getUserById } from "@/data/user";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
+    async signIn({ user }) {
+      const existingUser = await getUserById(user.id);
+
+      // 만약 사용자가 없거나 이메일 인증이 되어있지 않다면 로그인을 거부
+      if (!existingUser || !existingUser.emailVerified) {
+        return false;
+      }
+
+      return true;
+    },
     async session({ session, token }) {
-      console.log("session token", token); // session token은 jwt token과 동일
+      // console.log("session token", token); // session token은 jwt token과 동일
 
       if (token.sub && session.user) {
         session.user.id = token.sub; // session.user.id에 jwt token의 sub를 할당
       } // session.user.id가 없다면 jwt token의 sub를 할당해서 커스텀으로 사용
+
+      if (token.role && session.user) {
+        return { ...session, user: { ...session.user, role: token.role } };
+      } // jwt token의 role이 있다면 session.user.role에 할당
+
       return session;
     },
     async jwt({ token }) {
-      console.log("jwt token", token); // jwt sub는 사용자의 고유 식별자 === user.id
+      // console.log("jwt token", token); // jwt sub는 사용자의 고유 식별자 === user.id
+
+      if (!token.sub) return token; // jwt token에 sub이 없다면 그대로 반환
+
+      const existingUser = await db.user.findUnique({
+        where: { id: token.sub },
+      }); // jwt token의 sub로 사용자를 찾음
+
+      if (!existingUser) return token; // 사용자가 없다면 그대로 반환
+
+      token.role = existingUser.role; // jwt token에 사용자의 role을 할당
 
       return token;
     },
