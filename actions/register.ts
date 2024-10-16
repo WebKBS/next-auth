@@ -16,8 +16,10 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
 
   const { email, password, name } = validatedFields.data;
 
+  // 비밀번호 해싱
   const hashedPassword = await bcrypt.hash(password, 10);
 
+  // 이미 존재하는 이메일인지 확인
   const existingUser = await db.user.findUnique({
     where: {
       email,

@@ -1,4 +1,4 @@
-# Next js. Auth.js 인증 구현
+# Next js. Auth.js v5 인증 구현
 
 ## Version
 
