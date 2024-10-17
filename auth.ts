@@ -2,20 +2,19 @@ import NextAuth from "next-auth";
 import authConfig from "@/auth.config";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import db from "@/lib/db";
-import { getUserById } from "@/data/user";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
-    async signIn({ user }) {
-      const existingUser = await getUserById(user.id);
-
-      // 만약 사용자가 없거나 이메일 인증이 되어있지 않다면 로그인을 거부
-      if (!existingUser || !existingUser.emailVerified) {
-        return false;
-      }
-
-      return true;
-    },
+    // async signIn({ user }) {
+    //   const existingUser = await getUserById(user.id);
+    //
+    //   // 만약 사용자가 없거나 이메일 인증이 되어있지 않다면 로그인을 거부
+    //   if (!existingUser || !existingUser.emailVerified) {
+    //     return false;
+    //   }
+    //
+    //   return true;
+    // },
     async session({ session, token }) {
       // console.log("session token", token); // session token은 jwt token과 동일
 
