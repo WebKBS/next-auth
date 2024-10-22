@@ -12,7 +12,7 @@ export const publicRoutes = ["/"];
  * 이 경로는 로그인한 사용자를 /settings로 리디렉션합니다.
  * @type {string[]}
  * */
-export const authRoutes = ["/auth/login", "/auth/register"];
+export const authRoutes = ["/auth/login", "/auth/register", "/auth/error"];
 
 /**
  * 절대로 변경하지 마십시오.

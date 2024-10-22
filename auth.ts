@@ -4,6 +4,23 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import db from "@/lib/db";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  pages: {
+    // pages는 NextAuth의 페이지 경로를 설정
+    // 고정으로 된 디자인 외 새로운 페이지를 만들어 사용할 수 있음
+    signIn: "/auth/login",
+    error: "/auth/error",
+  },
+
+  events: {
+    async linkAccount({ user }) {
+      await db.user.update({
+        where: { id: user.id },
+        data: {
+          emailVerified: new Date(),
+        },
+      });
+    },
+  },
   callbacks: {
     // async signIn({ user }) {
     //   const existingUser = await getUserById(user.id);

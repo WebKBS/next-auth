@@ -18,10 +18,16 @@ import FormError from "@/components/auth/form-error";
 import FormSuccess from "@/components/auth/form-success";
 import { login } from "@/actions/login";
 import { useState, useTransition } from "react";
+import { useSearchParams } from "next/navigation";
 
 const LoginForm = () => {
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
+  const searchParams = useSearchParams();
+  const urlError =
+    searchParams.get("error") === "OAuthAccountNotLinkedError"
+      ? "계정이 연결되지 않았습니다."
+      : "";
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<z.infer<typeof LoginSchema>>({
@@ -49,8 +55,8 @@ const LoginForm = () => {
   return (
     <CardWrapper
       headerLabel="Welcome Back!"
-      backButtonLabel="Back to Home"
-      backButtonHref="/"
+      backButtonLabel="회원가입"
+      backButtonHref="/auth/register"
       showSocial={true}
     >
       <Form {...form}>
@@ -93,7 +99,7 @@ const LoginForm = () => {
               )}
             />
           </div>
-          <FormError message={error} />
+          <FormError message={error || urlError} />
           <FormSuccess message={success} />
           <Button type="submit" className={"w-full"} disabled={isPending}>
             Login
