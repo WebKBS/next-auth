@@ -13,8 +13,8 @@ const { auth } = NextAuth(authConfig);
 export default auth((req) => {
   // console.log(req.nextUrl.pathname); // config.matcher에 지정된 경로가 일치하면 이 미들웨어가 실행된다.
   const { nextUrl } = req;
-  const agent = userAgent(req);
-  console.log(agent);
+  // const agent = userAgent(req);
+  // console.log(agent);
   // 사용자가 로그인되어 있는지 확인
   const isLoggedIn = !!req.auth;
 

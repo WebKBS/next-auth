@@ -50,7 +50,7 @@ const LoginForm = () => {
     });
   };
 
-  console.log(isPending);
+  // console.log(isPending);
 
   return (
     <CardWrapper

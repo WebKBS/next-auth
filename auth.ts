@@ -33,7 +33,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     //   return true;
     // },
     async session({ session, token }) {
-      // console.log("session token", token); // session token은 jwt token과 동일
+      console.log("session token", token); // session token은 jwt token과 동일
 
       if (token.sub && session.user) {
         session.user.id = token.sub; // session.user.id에 jwt token의 sub를 할당
@@ -63,6 +63,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
 
   adapter: PrismaAdapter(db), // PrismaAdapter를 사용하도록 설정
-  session: { strategy: "jwt", maxAge: 60 * 60 }, // 세션 설정 - jwt 전략 사용
+  session: { strategy: "jwt", maxAge: 60 * 60 }, // 세션 설정 - jwt 전략 사용 및 만료 시간 1시간
   ...authConfig, // 구조분해를 통해 authConfig의 내용을 가져옴
 });
