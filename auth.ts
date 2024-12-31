@@ -1,7 +1,16 @@
-import NextAuth from "next-auth";
+import NextAuth, { Session } from "next-auth";
 import authConfig from "@/auth.config";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import db from "@/lib/db";
+import { JWT } from "@auth/core/jwt";
+
+type ExtendedSession = Session & {
+  accessToken?: string;
+  user?: {
+    id?: string;
+    role?: string;
+  };
+};
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   pages: {
@@ -32,23 +41,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     //
     //   return true;
     // },
-    async session({ session, token }) {
-      console.log("session token", token); // session token은 jwt token과 동일
 
-      if (token.sub && session.user) {
-        session.user.id = token.sub; // session.user.id에 jwt token의 sub를 할당
-      } // session.user.id가 없다면 jwt token의 sub를 할당해서 커스텀으로 사용
-
-      if (token.role && session.user) {
-        return { ...session, user: { ...session.user, role: token.role } };
-      } // jwt token의 role이 있다면 session.user.role에 할당
-
-      return session;
-    },
-    async jwt({ token }) {
-      // console.log("jwt token", token); // jwt sub는 사용자의 고유 식별자 === user.id
-
+    async jwt({ token, account }) {
       if (!token.sub) return token; // jwt token에 sub이 없다면 그대로 반환
+
+      if (account && account?.access_token) {
+        token.accessToken = account.access_token || token.accessToken; //
+      }
 
       const existingUser = await db.user.findUnique({
         where: { id: token.sub },
@@ -59,6 +58,27 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       token.role = existingUser.role; // jwt token에 사용자의 role을 할당
 
       return token;
+    },
+    async session({
+      session,
+      token,
+    }: {
+      session: ExtendedSession;
+      token: JWT;
+    }) {
+      if (typeof token.accessToken === "string") {
+        session.accessToken = token.accessToken;
+      }
+
+      if (token.sub && session.user) {
+        session.user.id = token.sub; // session.user.id에 jwt token의 sub를 할당
+      } // session.user.id가 없다면 jwt token의 sub를 할당해서 커스텀으로 사용
+
+      if (token.role && session.user) {
+        return { ...session, user: { ...session.user, role: token.role } };
+      } // jwt token의 role이 있다면 session.user.role에 할당
+
+      return session;
     },
   },
 
